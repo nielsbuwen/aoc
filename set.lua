@@ -31,6 +31,16 @@ function Set:keys()
     return result
 end
 
+function Set:__len()
+    local len = 0
+
+    for _, _ in pairs(self) do
+        len = len + 1
+    end
+
+    return len
+end
+
 function Set:iter()
     return pairs(self)
 end
