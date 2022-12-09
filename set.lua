@@ -1,14 +1,10 @@
-local Set = {}
-Set.__index = Set
+local Class = require 'class'
+local Set = Class.Set
 
-function Set.new(items)
-    local set = setmetatable({}, Set)
-
+function Set:init(items)
     for _, item in ipairs(items or {}) do
-        set[item] = true
+        self[item] = true
     end
-
-    return set
 end
 
 function Set.from_string(str)
@@ -85,7 +81,12 @@ function Set:__bor(other)
 end
 
 function Set:__tostring()
-    return '{' .. table.concat(self:keys(), ', ') .. '}'
+    local strings = {}
+    for key, _ in pairs(self) do
+        strings[#strings + 1] = tostring(key)
+    end
+
+    return '{' .. table.concat(strings, ', ') .. '}'
 end
 
 return Set
