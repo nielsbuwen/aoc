@@ -6,6 +6,10 @@ function Point:init(x, y)
     self.y = y or 0
 end
 
+function Point:__eq(other)
+    return self.x == other.x and self.y == other.y
+end
+
 function Point:__add(other)
     return Point(self.x + other.x, self.y + other.y)
 end

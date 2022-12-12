@@ -89,4 +89,12 @@ function Set:__tostring()
     return '{' .. table.concat(strings, ', ') .. '}'
 end
 
+function Set:adds(item)
+    self:add(tostring(item))
+end
+
+function Set:hass(item)
+    return self[tostring(item)]
+end
+
 return Set
