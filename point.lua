@@ -22,6 +22,10 @@ function Point:length_squared()
     return self.x ^ 2 + self.y ^ 2
 end
 
+function Point:copy()
+    return Point(self.x, self.y)
+end
+
 local function unit(length)
     if length == 0 then return 0 end
 
