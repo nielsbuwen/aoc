@@ -6,6 +6,10 @@ function Point:init(x, y)
     self.y = y or 0
 end
 
+function Point.from_string(x, y)
+    return Point(tonumber(x), tonumber(y))
+end
+
 function Point:__eq(other)
     return self.x == other.x and self.y == other.y
 end
@@ -42,6 +46,10 @@ end
 
 function Point:__tostring()
     return string.format("(%d, %d)", self.x, self.y)
+end
+
+function Point:manhattan_to(other)
+    return math.abs(self.x - other.x) + math.abs(self.y - other.y)
 end
 
 return Point
