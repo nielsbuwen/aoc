@@ -7,6 +7,16 @@ function Set:init(items)
     end
 end
 
+function Set:copy()
+    local copy = Set()
+
+    for k, v in pairs(self) do
+        copy[k] = v
+    end
+
+    return copy
+end
+
 function Set.from_string(str)
     local set = Set.new()
 
