@@ -8,6 +8,10 @@ function _Class:__call(...)
     return instance
 end
 
+function _Class:attach(instance)
+    setmetatable(instance)
+end
+
 function _Class:__tostring()
     return string.format("Class<%s>", self.name)
 end
