@@ -24,6 +24,14 @@ function Class:__index(class_name)
     class.__index = class
     class.name = class_name
 
+    function class:__str()
+        return "<%s instance>", self.name
+    end
+
+    function class:__tostring()
+        return string.format(self:__str())
+    end
+
     return class
 end
 

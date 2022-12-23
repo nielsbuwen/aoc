@@ -1,5 +1,6 @@
 local Dict = require 'dict'
 local Set = require 'set'
+local List = require 'list'
 local blueprints = {}
 
 for line in io.lines('input19.txt') do
@@ -68,6 +69,8 @@ end
 local function explore(blueprint, state, max, depth, forbidden, seen, best)
     best = best or 0
     depth = depth or 0
+
+    --[[
     seen = seen or {}
     local geode_hash = hash(state, state.geodes, 0)
     local better_depth = seen[geode_hash]
@@ -86,9 +89,9 @@ local function explore(blueprint, state, max, depth, forbidden, seen, best)
     end
 
     seen[depth_hash] = state.geodes
+    ]]
 
     forbidden = forbidden or Set()
-    if depth == max then return best end
 
     local moves = {}
     for _, material in pairs(MATERIALS) do
@@ -114,6 +117,8 @@ local function explore(blueprint, state, max, depth, forbidden, seen, best)
         best = state.geodes
     end
 
+    if depth + 1 == max then return best end
+
     for _, material in ipairs(moves) do
         local built = build(blueprint, state, material)
         --io.write(string.rep("  ", depth), " ", material, "  ", tostring(built), "\n")
@@ -129,8 +134,108 @@ local function explore(blueprint, state, max, depth, forbidden, seen, best)
 end
 
 local quality = 0
-for i = 1, 2 do
-    local best = explore(blueprints[2], empty(), 24)
+for i = 1, 0 do
+    local best = explore(blueprints[i], empty(), 32)
     print("best", i, best)
     quality = quality + i * best
 end
+print("total", quality)
+
+--[[
+Blueprint 1:
+  Each ore robot costs 4 ore.
+  Each clay robot costs 2 ore.
+  Each obsidian robot costs 3 ore and 14 clay.
+  Each geode robot costs 2 ore and 7 obsidian.
+
+
+-- time 24
+-- start ore=0
+-- end   ore=1
+
+-- time 23
+-- start ore=1
+-- end   ore=2
+
+-- time 22
+-- start ore=2
+-- could build
+
+]]
+
+local function advance(state)
+    return Dict{
+        ore = state.ore + state.ore_robots,
+        clay = state.clay + state.clay_robots,
+        obsidian = state.obsidian + state.obsidian_robots,
+        geodes = state.geodes + state.geode_robots,
+
+        ore_robots = state.ore_robots,
+        clay_robots = state.clay_robots,
+        obsidian_robots = state.obsidian_robots,
+        geode_robots = state.geode_robots,
+    }
+end
+
+local blueprint = blueprints[1]
+local state = empty()
+local forbidden = Set()
+
+for t = 24, 1, -1 do
+    print(string.format("-- Minute %02d, Time left %02d --", 25 - t, t))
+    print(state)
+
+    for _, material in ipairs(MATERIALS) do
+        local hypo = state
+
+        for i = 25 - t, 24, 1 do
+            if can_build(blueprint, hypo, material) then
+                print("you will be able to build", material, "in minute", i)
+                break
+            end
+
+            hypo = advance(hypo)
+        end
+    end
+
+    local can = List()
+    for _, material in ipairs(MATERIALS) do
+        if can_build(blueprint, state, material) and not forbidden[material] then
+            can[#can + 1] = material
+            forbidden:add(material)
+        end
+    end
+
+    state = advance(state)
+
+    if #can == 0 then
+        print("you must wait")
+    else
+        print("you can build a robot for", can)
+        if #can < 4 then
+            print("or you can wait")
+        end
+
+        ::bad::
+        io.write("what do? ")
+        local action = io.read()
+
+        if action == "wait" then
+            if #can == 4 then
+                print("it does not make sense to wait now")
+                goto bad
+            end
+        elseif can:find(action) then
+            state = build(blueprint, state, action)
+            forbidden = Set()
+            print("you built a robot for", action)
+        else
+            print("what?")
+            goto bad
+        end
+    end
+
+    print()
+end
+
+print("Done", state)

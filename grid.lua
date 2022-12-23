@@ -27,8 +27,11 @@ function Grid.from_file(file, converter)
     local width
     converter = converter or function(i) return i end
 
+    local extra
     local y = 0
-    for line in io.lines(file) do
+    local it = io.lines(file)
+    for line in it do
+        if line == "" then extra = it() break end
         y = y + 1
         for cell in line:gmatch '.' do
             data[#data + 1] = converter(cell)
@@ -37,7 +40,7 @@ function Grid.from_file(file, converter)
         width = #line
     end
 
-    return Grid(data, width, y)
+    return Grid(data, width, y), extra
 end
 
 function Grid:__tostring()
@@ -77,15 +80,69 @@ function Grid:__call(x, y, value)
 end
 
 function Grid:find(finder)
-    if not type(finder) == 'function' then
+
+    if type(finder) ~= 'function' then
         local value = finder
         finder = function(v) return v == value end
     end
 
     local mod = self.width
     for i, cell in ipairs(self.data) do
-        if finder == (cell) then
+        if finder(cell) then
             return self.offset_x + (i - 1) % mod + 1, self.offset_y + (i - 1) // mod + 1
+        end
+    end
+end
+
+function Grid:find_in_row(row, finder)
+    if not type(finder) == 'function' then
+        local value = finder
+        finder = function(v) return v == value end
+    end
+
+    for x = 1, self.width do
+        if finder(self(x, row)) then
+            return x
+        end
+    end
+end
+
+function Grid:find_in_column(column, finder)
+    if not type(finder) == 'function' then
+        local value = finder
+        finder = function(v) return v == value end
+    end
+
+    for y = 1, self.height do
+        if finder(self(column, y)) then
+            return y
+        end
+    end
+end
+
+function Grid:rfind_in_row(row, finder)
+    if not type(finder) == 'function' then
+        local value = finder
+        finder = function(v) return v == value end
+    end
+
+    for x = self.width, 1, -1 do
+        if finder(self(x, row)) then
+            return x
+        end
+    end
+end
+
+
+function Grid:rfind_in_column(column, finder)
+    if not type(finder) == 'function' then
+        local value = finder
+        finder = function(v) return v == value end
+    end
+
+    for y = self.height, 1, -1 do
+        if finder(self(column, y)) then
+            return y
         end
     end
 end
