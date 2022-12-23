@@ -1,9 +1,17 @@
 local Class = require 'class'
 local Point = Class.Point
 
+Point.__scale = 1000000
+
 function Point:init(x, y)
     self.x = x or 0
     self.y = y or 0
+end
+
+function Point:__hash()
+    --local s = Point.__scale
+    --return self.x * s + self.y
+    return tostring(self)
 end
 
 function Point.from_string(x, y)

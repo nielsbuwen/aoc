@@ -80,7 +80,6 @@ function Grid:__call(x, y, value)
 end
 
 function Grid:find(finder)
-
     if type(finder) ~= 'function' then
         local value = finder
         finder = function(v) return v == value end
@@ -92,6 +91,25 @@ function Grid:find(finder)
             return self.offset_x + (i - 1) % mod + 1, self.offset_y + (i - 1) // mod + 1
         end
     end
+end
+
+function Grid:find_all(finder)
+    local Point = require 'point'
+    local List = require 'list'
+
+    if type(finder) ~= 'function' then
+        local value = finder
+        finder = function(v) return v == value end
+    end
+
+    local found = List()
+    local mod = self.width
+    for i, cell in ipairs(self.data) do
+        if finder(cell) then
+            found[#found + 1] = Point(self.offset_x + (i - 1) % mod + 1, self.offset_y + (i - 1) // mod + 1)
+        end
+    end
+    return found
 end
 
 function Grid:find_in_row(row, finder)

@@ -99,12 +99,16 @@ function Set:__tostring()
     return '{' .. table.concat(strings, ', ') .. '}'
 end
 
-function Set:adds(item)
-    self:add(tostring(item))
+function Set:hash_add(item)
+    self[item:__hash()] = true
 end
 
-function Set:hass(item)
-    return self[tostring(item)]
+function Set:hash_has(item)
+    return self[item:__hash()] or false
+end
+
+function Set:hash_remove(item)
+    self[item:__hash()] = nil
 end
 
 return Set

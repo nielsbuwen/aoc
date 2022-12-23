@@ -17,6 +17,26 @@ function List:map(f)
     return mapped
 end
 
+function List:max()
+    local max = -1e999
+
+    for _, v in ipairs(self) do
+        if v > max then max = v end
+    end
+
+    return max
+end
+
+function List:min()
+    local min = 1e999
+
+    for _, v in ipairs(self) do
+        if v < min then min = v end
+    end
+
+    return min
+end
+
 function List:find(needle)
     for i, v in ipairs(self) do
         if v == needle then return i end
